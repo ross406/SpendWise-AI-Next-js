@@ -66,7 +66,7 @@ export function Header({ month, year, onMonthChange }: HeaderProps) {
         <Button
           variant="secondary"
           size="sm"
-          className="h-8 rounded-lg px-3 text-xs font-medium"
+          className="h-8 rounded-lg px-3 text-xs font-medium cursor-pointer"
           onClick={handlePrevMonth}
         >
           <ChevronDown className="mr-1 h-3 w-3 rotate-90" />
@@ -84,7 +84,7 @@ export function Header({ month, year, onMonthChange }: HeaderProps) {
             onMonthChange(m, y);
           }}
         >
-          <SelectTrigger className="h-8 w-28 rounded-lg border-0 bg-transparent px-3 text-xs font-medium shadow-none focus:ring-0">
+          <SelectTrigger className="h-8 w-28 rounded-lg border-0 bg-transparent px-3 text-xs font-medium shadow-none focus:ring-0 cursor-pointer">
             <SelectValue>
               {months[month - 1]?.toUpperCase()} {year}
             </SelectValue>
@@ -110,7 +110,7 @@ export function Header({ month, year, onMonthChange }: HeaderProps) {
         <Button
           variant="secondary"
           size="sm"
-          className="h-8 rounded-lg px-3 text-xs font-medium"
+          className="h-8 rounded-lg px-3 text-xs font-medium cursor-pointer"
           onClick={handleNextMonth}
         >
           {months[month % 12]?.slice(0, 3).toUpperCase()}{" "}
@@ -124,7 +124,7 @@ export function Header({ month, year, onMonthChange }: HeaderProps) {
         value={currency}
         onValueChange={(value) => setCurrency(value as typeof currency)}
       >
-        <SelectTrigger className="h-9 w-24 border-border bg-card text-xs">
+        <SelectTrigger className="h-9 w-24 border-border bg-card text-xs cursor-pointer">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

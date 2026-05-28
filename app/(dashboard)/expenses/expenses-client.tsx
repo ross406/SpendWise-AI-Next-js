@@ -7,13 +7,19 @@ import {
   ExternalLink,
   Search,
   Download,
+  Sparkles,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ExpensesTable } from "@/components/expenses/expenses-table";
 import { ExpenseForm } from "@/components/expenses/expense-form";
-import { getExpenses, exportExpensesToCSV } from "@/app/actions/expenses";
+import { BankStatementImport } from "@/components/expenses/bank-statement-import";
+import {
+  getExpenses,
+  exportExpensesToCSV,
+  createExpense,
+} from "@/app/actions/expenses";
 import type { ExpenseCategory } from "@/lib/db/models/expense-types";
 
 interface Expense {
@@ -73,6 +79,23 @@ export function ExpensesClient({
     }
   };
 
+  // Called by BankStatementImport after AI detection + user review
+  const handleBulkImport = async (
+    detectedExpenses: {
+      date: string;
+      description: string;
+      amount: number;
+      currency: string;
+      category: ExpenseCategory;
+    }[],
+  ) => {
+    // Add each expense sequentially via your existing server action
+    for (const expense of detectedExpenses) {
+      await createExpense(expense);
+    }
+    await refreshExpenses();
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -113,14 +136,29 @@ export function ExpensesClient({
                 />
               </div>
 
-              <Button variant="outline" onClick={handleExport}>
+              <Button
+                variant="outline"
+                onClick={handleExport}
+                className="cursor-pointer"
+              >
                 <Download className="mr-2 h-4 w-4" />
                 Export
               </Button>
 
+              {/* ✨ AI Import Button */}
+              <BankStatementImport
+                onImport={handleBulkImport}
+                trigger={
+                  <Button variant="outline" className="cursor-pointer">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Import
+                  </Button>
+                }
+              />
+
               <ExpenseForm
                 trigger={
-                  <Button className="bg-expense text-white hover:bg-expense/90">
+                  <Button className="bg-expense text-white hover:bg-expense/90 cursor-pointer">
                     <Plus className="mr-2 h-4 w-4" />
                     Add Record
                   </Button>
