@@ -1,16 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 import { Header } from "@/components/header";
 import { CurrencyProvider } from "@/lib/contexts/currency-context";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const now = new Date();
@@ -37,14 +34,26 @@ export default function DashboardLayout({
   };
 
   return (
-    <CurrencyProvider>
-      <div className="min-h-screen bg-background">
-        <Sidebar />
-        <div className="ml-56">
-          <Header month={month} year={year} onMonthChange={handleMonthChange} />
-          <main className="p-6">{children}</main>
-        </div>
+    <div className="min-h-screen bg-background">
+      <Sidebar />
+      <div className="ml-56">
+        <Header month={month} year={year} onMonthChange={handleMonthChange} />
+        <main className="p-6">{children}</main>
       </div>
+    </div>
+  );
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <CurrencyProvider>
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <DashboardLayoutContent>{children}</DashboardLayoutContent>
+      </Suspense>
     </CurrencyProvider>
   );
 }
