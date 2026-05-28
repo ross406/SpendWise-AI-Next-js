@@ -44,6 +44,21 @@ const financialFacts = [
   "An emergency fund should cover 3-6 months of expenses.",
 ];
 
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 export function DashboardClient({
   userName,
   initialTotalIncome,
@@ -61,40 +76,23 @@ export function DashboardClient({
     );
   }, []);
 
-  // Calculate totals (convert all currencies to display currency)
-  const totalIncome = initialTotalIncome.reduce((sum, item) => {
-    return sum + convertAmount(item.total, item._id);
-  }, 0);
-
-  const totalExpenses = initialTotalExpenses.reduce((sum, item) => {
-    return sum + convertAmount(item.total, item._id);
-  }, 0);
-
+  const totalIncome = initialTotalIncome.reduce(
+    (sum, item) => sum + convertAmount(item.total, item._id),
+    0,
+  );
+  const totalExpenses = initialTotalExpenses.reduce(
+    (sum, item) => sum + convertAmount(item.total, item._id),
+    0,
+  );
   const balance = totalIncome - totalExpenses;
   const usagePercent =
     totalIncome > 0 ? ((totalExpenses / totalIncome) * 100).toFixed(1) : "0";
 
-  // Transform expenses by category for charts
   const categoryData = initialExpensesByCategory.map((item) => ({
     category: item._id.category,
     amount: item.total,
     currency: item._id.currency,
   }));
-
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
 
   return (
     <div className="space-y-6">
@@ -110,8 +108,8 @@ export function DashboardClient({
 
       {/* Financial Fun Fact */}
       <Card className="border-primary/20 bg-card">
-        <CardContent className="flex items-center gap-4 py-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+        <CardContent className="flex items-start gap-4 py-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
             <Sparkles className="h-5 w-5 text-primary" />
           </div>
           <div>
@@ -127,7 +125,6 @@ export function DashboardClient({
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3">
-        {/* Total Income */}
         <Card className="border-border bg-card">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -147,7 +144,6 @@ export function DashboardClient({
           </CardContent>
         </Card>
 
-        {/* Total Expenses */}
         <Card className="border-border bg-card">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -167,7 +163,6 @@ export function DashboardClient({
           </CardContent>
         </Card>
 
-        {/* Remaining Balance */}
         <Card className="border-border bg-card">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -194,7 +189,6 @@ export function DashboardClient({
 
       {/* Charts Section */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Expenditure Flow */}
         <Card className="border-border bg-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
@@ -211,7 +205,6 @@ export function DashboardClient({
           </CardContent>
         </Card>
 
-        {/* Market Share */}
         <Card className="border-border bg-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
@@ -245,13 +238,13 @@ export function DashboardClient({
             <Calendar className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between rounded-lg bg-secondary/50 p-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-card">
+            <div className="flex items-center justify-between gap-2 rounded-lg bg-secondary/50 p-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-card">
                   <Calendar className="h-5 w-5 text-muted-foreground" />
                 </div>
-                <div>
-                  <p className="text-sm font-semibold">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">
                     House Rent{" "}
                     <Badge variant="secondary" className="ml-2 text-[10px]">
                       BILL
@@ -262,18 +255,19 @@ export function DashboardClient({
                   </p>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="shrink-0 text-right">
                 <p className="font-semibold">{formatAmount(13500)}</p>
                 <Badge className="badge-housing text-[10px]">HOUSING</Badge>
               </div>
             </div>
-            <div className="flex items-center justify-between rounded-lg bg-secondary/50 p-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-card">
+
+            <div className="flex items-center justify-between gap-2 rounded-lg bg-secondary/50 p-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-card">
                   <Calendar className="h-5 w-5 text-muted-foreground" />
                 </div>
-                <div>
-                  <p className="text-sm font-semibold">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">
                     Electricity{" "}
                     <Badge variant="secondary" className="ml-2 text-[10px]">
                       BILL
@@ -284,11 +278,12 @@ export function DashboardClient({
                   </p>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="shrink-0 text-right">
                 <p className="font-semibold">{formatAmount(2000)}</p>
                 <Badge className="badge-utilities text-[10px]">UTILITIES</Badge>
               </div>
             </div>
+
             <Button
               variant="ghost"
               className="w-full text-xs text-muted-foreground"
@@ -338,11 +333,12 @@ export function DashboardClient({
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
+          {/* 2x2 on mobile, 4 across on desktop */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             <Card className="border-border bg-secondary/30">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 text-primary">
-                  <TrendingUp className="h-4 w-4" />
+                  <TrendingUp className="h-4 w-4 shrink-0" />
                   <span className="text-xs font-medium">Current Outlook</span>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
@@ -352,10 +348,11 @@ export function DashboardClient({
                 </p>
               </CardContent>
             </Card>
+
             <Card className="border-border bg-secondary/30">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 text-expense">
-                  <Target className="h-4 w-4" />
+                  <Target className="h-4 w-4 shrink-0" />
                   <span className="text-xs font-medium">Main Focus</span>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
@@ -365,10 +362,11 @@ export function DashboardClient({
                 </p>
               </CardContent>
             </Card>
+
             <Card className="border-border bg-secondary/30">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 text-income">
-                  <Wallet className="h-4 w-4" />
+                  <Wallet className="h-4 w-4 shrink-0" />
                   <span className="text-xs font-medium">Savings Status</span>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
@@ -378,10 +376,11 @@ export function DashboardClient({
                 </p>
               </CardContent>
             </Card>
+
             <Card className="border-border bg-secondary/30">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 text-chart-3">
-                  <Sparkles className="h-4 w-4" />
+                  <Sparkles className="h-4 w-4 shrink-0" />
                   <span className="text-xs font-medium">Quick Tip</span>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
@@ -393,10 +392,11 @@ export function DashboardClient({
             </Card>
           </div>
 
+          {/* Deep Analysis CTA — stacks on mobile */}
           <Card className="mt-4 border-border bg-secondary/30">
-            <CardContent className="flex items-center justify-between p-4">
+            <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
-                <Sparkles className="h-5 w-5 text-muted-foreground" />
+                <Sparkles className="h-5 w-5 shrink-0 text-muted-foreground" />
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Ready for Deeper Analysis?
@@ -406,7 +406,7 @@ export function DashboardClient({
                   </p>
                 </div>
               </div>
-              <Button variant="ghost" className="text-sm">
+              <Button variant="ghost" className="w-full text-sm sm:w-auto">
                 Analyze Deep Strategic Depth{" "}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>

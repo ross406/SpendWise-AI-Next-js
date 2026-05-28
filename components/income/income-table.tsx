@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import { format } from 'date-fns'
-import { Pencil, Trash2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { format } from "date-fns";
+import { Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,44 +22,44 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { useCurrency } from '@/lib/contexts/currency-context'
-import { IncomeForm } from './income-form'
-import { deleteIncome } from '@/app/actions/income'
+} from "@/components/ui/alert-dialog";
+import { useCurrency } from "@/lib/contexts/currency-context";
+import { IncomeForm } from "./income-form";
+import { deleteIncome } from "@/app/actions/income";
 
 interface Income {
-  _id: string
-  date: string
-  description: string
-  amount: number
-  currency: string
-  isRecurring: boolean
-  recurringFrequency?: 'monthly' | 'weekly' | 'yearly'
+  _id: string;
+  date: string;
+  description: string;
+  amount: number;
+  currency: string;
+  isRecurring: boolean;
+  recurringFrequency?: "monthly" | "weekly" | "yearly";
 }
 
 interface IncomeTableProps {
-  incomes: Income[]
-  onRefresh: () => void
+  incomes: Income[];
+  onRefresh: () => void;
 }
 
 export function IncomeTable({ incomes, onRefresh }: IncomeTableProps) {
-  const { formatAmount } = useCurrency()
+  const { formatAmount } = useCurrency();
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteIncome(id)
-      onRefresh()
+      await deleteIncome(id);
+      onRefresh();
     } catch (error) {
-      console.error('Failed to delete income:', error)
+      console.error("Failed to delete income:", error);
     }
-  }
+  };
 
   if (incomes.length === 0) {
     return (
       <div className="flex h-48 items-center justify-center text-muted-foreground">
         No income records found for this period
       </div>
-    )
+    );
   }
 
   return (
@@ -72,7 +72,7 @@ export function IncomeTable({ incomes, onRefresh }: IncomeTableProps) {
           <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Description
           </TableHead>
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <TableHead className="hidden sm:table-cell text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Recurring
           </TableHead>
           <TableHead className="text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -85,12 +85,15 @@ export function IncomeTable({ incomes, onRefresh }: IncomeTableProps) {
         {incomes.map((income) => (
           <TableRow key={income._id} className="border-border">
             <TableCell className="font-medium">
-              {format(new Date(income.date), 'MMM dd, yyyy')}
+              {format(new Date(income.date), "MMM dd, yyyy")}
             </TableCell>
             <TableCell>{income.description}</TableCell>
-            <TableCell>
+            <TableCell className="hidden sm:table-cell">
               {income.isRecurring && (
-                <Badge variant="secondary" className="bg-primary/20 text-primary text-xs uppercase">
+                <Badge
+                  variant="secondary"
+                  className="bg-primary/20 text-primary text-xs uppercase"
+                >
                   Recurring
                 </Badge>
               )}
@@ -111,7 +114,11 @@ export function IncomeTable({ incomes, onRefresh }: IncomeTableProps) {
                 />
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </AlertDialogTrigger>
@@ -119,8 +126,8 @@ export function IncomeTable({ incomes, onRefresh }: IncomeTableProps) {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete Income</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Are you sure you want to delete this income record? This action cannot be
-                        undone.
+                        Are you sure you want to delete this income record? This
+                        action cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -140,5 +147,5 @@ export function IncomeTable({ incomes, onRefresh }: IncomeTableProps) {
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }

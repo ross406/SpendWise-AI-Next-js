@@ -79,7 +79,6 @@ export function ExpensesClient({
     }
   };
 
-  // Called by BankStatementImport after AI detection + user review
   const handleBulkImport = async (
     detectedExpenses: {
       date: string;
@@ -89,7 +88,6 @@ export function ExpensesClient({
       category: ExpenseCategory;
     }[],
   ) => {
-    // Add each expense sequentially via your existing server action
     for (const expense of detectedExpenses) {
       await createExpense(expense);
     }
@@ -109,9 +107,10 @@ export function ExpensesClient({
       {/* Expenses Card */}
       <Card className="border-border bg-card">
         <CardContent className="p-6">
-          <div className="flex items-center justify-between">
+          {/* Top row: icon+title left, Add Record right */}
+          <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-expense/10">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-expense/10">
                 <TrendingDown className="h-6 w-6 text-expense" />
               </div>
               <div>
@@ -125,54 +124,55 @@ export function ExpensesClient({
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Filter transactions..."
-                  value={search}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  className="w-48 pl-9"
-                />
-              </div>
+            <ExpenseForm
+              trigger={
+                <Button className="shrink-0 bg-expense text-white hover:bg-expense/90 cursor-pointer">
+                  <Plus className="mr-2 h-4 w-4" />
+                  <span className="hidden sm:inline">Add Record</span>
+                  <span className="sm:hidden">Add</span>
+                </Button>
+              }
+              onSuccess={refreshExpenses}
+            />
+          </div>
 
-              <Button
-                variant="outline"
-                onClick={handleExport}
-                className="cursor-pointer"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Export
-              </Button>
-
-              {/* ✨ AI Import Button */}
-              <BankStatementImport
-                onImport={handleBulkImport}
-                trigger={
-                  <Button variant="outline" className="cursor-pointer">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Import
-                  </Button>
-                }
-              />
-
-              <ExpenseForm
-                trigger={
-                  <Button className="bg-expense text-white hover:bg-expense/90 cursor-pointer">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Record
-                  </Button>
-                }
-                onSuccess={refreshExpenses}
+          {/* Bottom row: search + secondary actions */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <div className="relative flex-1 sm:max-w-48">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Filter transactions..."
+                value={search}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="w-full pl-9"
               />
             </div>
+
+            <Button
+              variant="outline"
+              onClick={handleExport}
+              className="cursor-pointer"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+
+            <BankStatementImport
+              onImport={handleBulkImport}
+              trigger={
+                <Button variant="outline" className="cursor-pointer">
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Import - Bank Statement
+                </Button>
+              }
+            />
           </div>
         </CardContent>
       </Card>
 
       {/* Expenses Table */}
       <Card className="border-border bg-card">
-        <CardContent className="p-0">
+        <CardContent className="overflow-x-auto p-0">
           <ExpensesTable expenses={expenses} onRefresh={refreshExpenses} />
         </CardContent>
       </Card>

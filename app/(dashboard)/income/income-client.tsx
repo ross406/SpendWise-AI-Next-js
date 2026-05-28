@@ -1,38 +1,42 @@
-'use client'
+"use client";
 
-import { useState, useCallback } from 'react'
-import { TrendingUp, Plus, ExternalLink } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { IncomeTable } from '@/components/income/income-table'
-import { IncomeForm } from '@/components/income/income-form'
-import { getIncomes } from '@/app/actions/income'
+import { useState, useCallback } from "react";
+import { TrendingUp, Plus, ExternalLink } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { IncomeTable } from "@/components/income/income-table";
+import { IncomeForm } from "@/components/income/income-form";
+import { getIncomes } from "@/app/actions/income";
 
 interface Income {
-  _id: string
-  date: string
-  description: string
-  amount: number
-  currency: string
-  isRecurring: boolean
-  recurringFrequency?: 'monthly' | 'weekly' | 'yearly'
+  _id: string;
+  date: string;
+  description: string;
+  amount: number;
+  currency: string;
+  isRecurring: boolean;
+  recurringFrequency?: "monthly" | "weekly" | "yearly";
 }
 
 interface IncomeClientProps {
-  initialIncomes: Income[]
-  initialMonth: number
-  initialYear: number
+  initialIncomes: Income[];
+  initialMonth: number;
+  initialYear: number;
 }
 
-export function IncomeClient({ initialIncomes, initialMonth, initialYear }: IncomeClientProps) {
-  const [incomes, setIncomes] = useState<Income[]>(initialIncomes)
-  const [month] = useState(initialMonth)
-  const [year] = useState(initialYear)
+export function IncomeClient({
+  initialIncomes,
+  initialMonth,
+  initialYear,
+}: IncomeClientProps) {
+  const [incomes, setIncomes] = useState<Income[]>(initialIncomes);
+  const [month] = useState(initialMonth);
+  const [year] = useState(initialYear);
 
   const refreshIncomes = useCallback(async () => {
-    const data = await getIncomes(month, year)
-    setIncomes(data as Income[])
-  }, [month, year])
+    const data = await getIncomes(month, year);
+    setIncomes(data as Income[]);
+  }, [month, year]);
 
   return (
     <div className="space-y-6">
@@ -45,9 +49,9 @@ export function IncomeClient({ initialIncomes, initialMonth, initialYear }: Inco
       {/* Income Card */}
       <Card className="border-border bg-card">
         <CardContent className="p-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-income/10">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-income/10">
                 <TrendingUp className="h-6 w-6 text-income" />
               </div>
               <div>
@@ -55,13 +59,15 @@ export function IncomeClient({ initialIncomes, initialMonth, initialYear }: Inco
                   <h2 className="text-xl font-bold">Income</h2>
                   <ExternalLink className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <p className="text-sm text-muted-foreground">Manage your income sources and history</p>
+                <p className="text-sm text-muted-foreground">
+                  Manage your income sources and history
+                </p>
               </div>
             </div>
 
             <IncomeForm
               trigger={
-                <Button className="bg-income text-white hover:bg-income/90">
+                <Button className="w-full bg-income text-white hover:bg-income/90 sm:w-auto">
                   <Plus className="mr-2 h-4 w-4" />
                   Add Income
                 </Button>
@@ -74,10 +80,10 @@ export function IncomeClient({ initialIncomes, initialMonth, initialYear }: Inco
 
       {/* Income Table */}
       <Card className="border-border bg-card">
-        <CardContent className="p-0">
+        <CardContent className="overflow-x-auto p-0">
           <IncomeTable incomes={incomes} onRefresh={refreshIncomes} />
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
