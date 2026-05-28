@@ -35,6 +35,7 @@ import {
   type ExpenseCategory,
 } from "@/lib/db/models/expense-types";
 import { createExpense, updateExpense } from "@/app/actions/expenses";
+import { useCurrency } from "@/lib/contexts/currency-context";
 import { cn } from "@/lib/utils";
 
 const expenseSchema = z.object({
@@ -75,6 +76,7 @@ interface ExpenseFormProps {
 export function ExpenseForm({ expense, trigger, onSuccess }: ExpenseFormProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { currency: userCurrency } = useCurrency();
 
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(expenseSchema),
@@ -82,7 +84,7 @@ export function ExpenseForm({ expense, trigger, onSuccess }: ExpenseFormProps) {
       date: expense ? new Date(expense.date) : new Date(),
       description: expense?.description || "",
       amount: expense?.amount || 0,
-      currency: expense?.currency || "USD",
+      currency: expense?.currency || userCurrency,
       category: expense?.category || "other",
     },
   });

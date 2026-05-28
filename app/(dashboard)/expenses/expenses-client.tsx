@@ -13,10 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ExpensesTable } from "@/components/expenses/expenses-table";
 import { ExpenseForm } from "@/components/expenses/expense-form";
-import {
-  getExpenses,
-  // exportExpensesToCSV
-} from "@/app/actions/expenses";
+import { getExpenses, exportExpensesToCSV } from "@/app/actions/expenses";
 import type { ExpenseCategory } from "@/lib/db/models/expense-types";
 
 interface Expense {
@@ -61,16 +58,16 @@ export function ExpensesClient({
 
   const handleExport = async () => {
     try {
-      // const csv = await exportExpensesToCSV(month, year)
-      // const blob = new Blob([csv], { type: 'text/csv' })
-      // const url = URL.createObjectURL(blob)
-      // const a = document.createElement('a')
-      // a.href = url
-      // a.download = `expenses-${year}-${month.toString().padStart(2, '0')}.csv`
-      // document.body.appendChild(a)
-      // a.click()
-      // document.body.removeChild(a)
-      // URL.revokeObjectURL(url)
+      const csv = await exportExpensesToCSV(month, year);
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `expenses-${year}-${month.toString().padStart(2, "0")}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Failed to export expenses:", error);
     }

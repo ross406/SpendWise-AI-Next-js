@@ -3,19 +3,23 @@ import { redirect } from "next/navigation";
 import { ExpensesClient } from "./expenses-client";
 import { getExpenses } from "@/app/actions/expenses";
 
-export default async function ExpensesPage() {
+export default async function ExpensesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ month?: string; year?: string }>;
+}) {
   const { userId } = await auth();
 
   if (!userId) {
     redirect("/sign-in");
   }
 
+  const params = await searchParams;
   const now = new Date();
-  const month = now.getMonth() + 1;
-  const year = now.getFullYear();
+  const month = params.month ? parseInt(params.month) : now.getMonth() + 1;
+  const year = params.year ? parseInt(params.year) : now.getFullYear();
 
   const expenses = await getExpenses(month, year);
-  console.log("Fetched expenses:", expenses);
   return (
     <ExpensesClient
       initialExpenses={expenses}

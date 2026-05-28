@@ -1,20 +1,25 @@
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
-import { IncomeClient } from './income-client'
-import { getIncomes } from '@/app/actions/income'
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { IncomeClient } from "./income-client";
+import { getIncomes } from "@/app/actions/income";
 
-export default async function IncomePage() {
-  const { userId } = await auth()
-  
+export default async function IncomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ month?: string; year?: string }>;
+}) {
+  const { userId } = await auth();
+
   if (!userId) {
-    redirect('/sign-in')
+    redirect("/sign-in");
   }
 
-  const now = new Date()
-  const month = now.getMonth() + 1
-  const year = now.getFullYear()
+  const params = await searchParams;
+  const now = new Date();
+  const month = params.month ? parseInt(params.month) : now.getMonth() + 1;
+  const year = params.year ? parseInt(params.year) : now.getFullYear();
 
-  const incomes = await getIncomes(month, year)
+  const incomes = await getIncomes(month, year);
 
   return (
     <IncomeClient
@@ -22,5 +27,5 @@ export default async function IncomePage() {
       initialMonth={month}
       initialYear={year}
     />
-  )
+  );
 }

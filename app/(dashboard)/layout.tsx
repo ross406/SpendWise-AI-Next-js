@@ -1,23 +1,40 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Sidebar } from '@/components/sidebar'
-import { Header } from '@/components/header'
-import { CurrencyProvider } from '@/lib/contexts/currency-context'
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Sidebar } from "@/components/sidebar";
+import { Header } from "@/components/header";
+import { CurrencyProvider } from "@/lib/contexts/currency-context";
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const now = new Date()
-  const [month, setMonth] = useState(now.getMonth() + 1)
-  const [year, setYear] = useState(now.getFullYear())
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const now = new Date();
+
+  const [month, setMonth] = useState(now.getMonth() + 1);
+  const [year, setYear] = useState(now.getFullYear());
+
+  // Initialize month/year from URL params
+  useEffect(() => {
+    const urlMonth = searchParams.get("month");
+    const urlYear = searchParams.get("year");
+
+    if (urlMonth && urlYear) {
+      setMonth(parseInt(urlMonth));
+      setYear(parseInt(urlYear));
+    }
+  }, [searchParams]);
 
   const handleMonthChange = (newMonth: number, newYear: number) => {
-    setMonth(newMonth)
-    setYear(newYear)
-  }
+    setMonth(newMonth);
+    setYear(newYear);
+    // Update URL with new month/year
+    router.push(`?month=${newMonth}&year=${newYear}`);
+  };
 
   return (
     <CurrencyProvider>
@@ -29,5 +46,5 @@ export default function DashboardLayout({
         </div>
       </div>
     </CurrencyProvider>
-  )
+  );
 }
