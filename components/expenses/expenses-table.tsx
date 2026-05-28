@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import { format } from 'date-fns'
-import { Pencil, Trash2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { format } from "date-fns";
+import { Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,56 +22,67 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { useCurrency } from '@/lib/contexts/currency-context'
-import { ExpenseForm } from './expense-form'
-import { deleteExpense } from '@/app/actions/expenses'
-import type { ExpenseCategory } from '@/lib/db/models/expense'
+} from "@/components/ui/alert-dialog";
+import { useCurrency } from "@/lib/contexts/currency-context";
+import { ExpenseForm } from "./expense-form";
+import { deleteExpense } from "@/app/actions/expenses";
+// import type { ExpenseCategory } from "@/lib/db/models/expense";
+
+export type ExpenseCategory =
+  | "housing"
+  | "utilities"
+  | "gym"
+  | "food"
+  | "transport"
+  | "entertainment"
+  | "healthcare"
+  | "shopping"
+  | "other";
 
 interface Expense {
-  _id: string
-  date: string
-  description: string
-  amount: number
-  currency: string
-  category: ExpenseCategory
+  _id: string;
+  date: string;
+  description: string;
+  amount: number;
+  currency: string;
+  category: ExpenseCategory;
 }
 
 interface ExpensesTableProps {
-  expenses: Expense[]
-  onRefresh: () => void
+  expenses: Expense[];
+  onRefresh: () => void;
 }
 
 const categoryLabels: Record<string, string> = {
-  housing: 'HOUSING',
-  utilities: 'UTILITIES',
-  gym: 'GYM',
-  food: 'FOOD',
-  transport: 'TRANSPORT',
-  entertainment: 'ENTERTAINMENT',
-  healthcare: 'HEALTHCARE',
-  shopping: 'SHOPPING',
-  other: 'OTHER',
-}
+  housing: "HOUSING",
+  utilities: "UTILITIES",
+  gym: "GYM",
+  food: "FOOD",
+  transport: "TRANSPORT",
+  entertainment: "ENTERTAINMENT",
+  healthcare: "HEALTHCARE",
+  shopping: "SHOPPING",
+  other: "OTHER",
+};
 
 export function ExpensesTable({ expenses, onRefresh }: ExpensesTableProps) {
-  const { formatAmount } = useCurrency()
+  const { formatAmount } = useCurrency();
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteExpense(id)
-      onRefresh()
+      await deleteExpense(id);
+      onRefresh();
     } catch (error) {
-      console.error('Failed to delete expense:', error)
+      console.error("Failed to delete expense:", error);
     }
-  }
+  };
 
   if (expenses.length === 0) {
     return (
       <div className="flex h-48 items-center justify-center text-muted-foreground">
         No expense records found for this period
       </div>
-    )
+    );
   }
 
   return (
@@ -97,7 +108,7 @@ export function ExpensesTable({ expenses, onRefresh }: ExpensesTableProps) {
         {expenses.map((expense) => (
           <TableRow key={expense._id} className="border-border">
             <TableCell className="font-medium">
-              {format(new Date(expense.date), 'MMM dd, yyyy')}
+              {format(new Date(expense.date), "MMM dd, yyyy")}
             </TableCell>
             <TableCell>{expense.description}</TableCell>
             <TableCell>
@@ -121,7 +132,11 @@ export function ExpensesTable({ expenses, onRefresh }: ExpensesTableProps) {
                 />
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </AlertDialogTrigger>
@@ -129,8 +144,8 @@ export function ExpensesTable({ expenses, onRefresh }: ExpensesTableProps) {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete Expense</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Are you sure you want to delete this expense record? This action cannot be
-                        undone.
+                        Are you sure you want to delete this expense record?
+                        This action cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -150,5 +165,5 @@ export function ExpensesTable({ expenses, onRefresh }: ExpensesTableProps) {
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }
