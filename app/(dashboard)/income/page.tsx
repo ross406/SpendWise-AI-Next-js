@@ -1,3 +1,5 @@
+import { unstable_noStore as noStore } from "next/cache";
+
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { IncomeClient } from "./income-client";
@@ -8,6 +10,7 @@ export default async function IncomePage({
 }: {
   searchParams: Promise<{ month?: string; year?: string }>;
 }) {
+  noStore();
   const { userId } = await auth();
 
   if (!userId) {
@@ -23,6 +26,7 @@ export default async function IncomePage({
 
   return (
     <IncomeClient
+      key={`${month}-${year}`}
       initialIncomes={incomes}
       initialMonth={month}
       initialYear={year}

@@ -111,7 +111,7 @@ export function Header({ month, year, onMonthChange }: HeaderProps) {
               onMonthChange(m, y);
             }}
           >
-            <SelectTrigger className="h-8 w-28 rounded-lg border-0 bg-transparent px-3 text-xs font-medium shadow-none focus:ring-0 cursor-pointer">
+            <SelectTrigger className="h-8 rounded-lg border-0 bg-transparent px-3 text-xs font-medium shadow-none focus:ring-0 cursor-pointer">
               <SelectValue>
                 {months[month - 1]?.toUpperCase()} {year}
               </SelectValue>

@@ -97,36 +97,19 @@ export function DashboardClient({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
+      {/* <div>
         <h1 className="text-2xl font-bold uppercase tracking-wider">
           Dashboard
         </h1>
         <p className="text-sm text-muted-foreground">
           Welcome back, {userName}
         </p>
-      </div>
-
-      {/* Financial Fun Fact */}
-      <Card className="border-primary/20 bg-card">
-        <CardContent className="flex items-start gap-4 py-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
-            <Sparkles className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-primary">
-              Financial Fun Fact
-            </p>
-            <p className="text-sm font-semibold text-foreground">
-              {randomFact}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      </div> */}
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="border-border bg-card">
-          <CardContent className="pt-6">
+          <CardContent>
             <div className="flex items-center justify-between">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Total Income
@@ -145,7 +128,7 @@ export function DashboardClient({
         </Card>
 
         <Card className="border-border bg-card">
-          <CardContent className="pt-6">
+          <CardContent>
             <div className="flex items-center justify-between">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Total Expenses
@@ -164,7 +147,7 @@ export function DashboardClient({
         </Card>
 
         <Card className="border-border bg-card">
-          <CardContent className="pt-6">
+          <CardContent>
             <div className="flex items-center justify-between">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Remaining Balance
@@ -225,7 +208,7 @@ export function DashboardClient({
       {/* Bottom Section */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Upcoming Records */}
-        <Card className="border-border bg-card">
+        {/* <Card className="border-border bg-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardTitle className="text-sm font-bold uppercase tracking-wider">
@@ -291,10 +274,10 @@ export function DashboardClient({
               Full Calendar View
             </Button>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Savings Goals */}
-        <Card className="border-border bg-card">
+        {/* <Card className="border-border bg-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardTitle className="text-sm font-bold uppercase tracking-wider">
@@ -314,7 +297,7 @@ export function DashboardClient({
               Start tracking your savings
             </p>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       {/* AI Financial Assistant */}
@@ -412,6 +395,23 @@ export function DashboardClient({
               </Button>
             </CardContent>
           </Card>
+        </CardContent>
+      </Card>
+
+      {/* Financial Fun Fact */}
+      <Card className="border-primary/20 bg-card">
+        <CardContent className="flex items-start gap-4 py-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+            <Sparkles className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-primary">
+              Financial Fun Fact
+            </p>
+            <p className="text-sm font-semibold text-foreground">
+              {randomFact}
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>

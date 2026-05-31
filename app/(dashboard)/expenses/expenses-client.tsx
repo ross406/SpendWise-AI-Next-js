@@ -20,7 +20,11 @@ import {
   exportExpensesToCSV,
   createExpense,
 } from "@/app/actions/expenses";
-import type { ExpenseCategory } from "@/lib/db/models/expense-types";
+import {
+  EXPENSE_CATEGORIES,
+  type ExpenseCategory,
+} from "@/lib/db/models/expense-types";
+import { DetectedExpense } from "@/components/expenses/types";
 
 interface Expense {
   _id: string;
@@ -44,13 +48,15 @@ export function ExpensesClient({
 }: ExpensesClientProps) {
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
   const [search, setSearch] = useState("");
-  const [month] = useState(initialMonth);
-  const [year] = useState(initialYear);
 
   const refreshExpenses = useCallback(async () => {
-    const data = await getExpenses(month, year, search || undefined);
+    const data = await getExpenses(
+      initialMonth,
+      initialYear,
+      search || undefined,
+    );
     setExpenses(data as Expense[]);
-  }, [month, year, search]);
+  }, [initialMonth, initialYear, search]);
 
   useEffect(() => {
     refreshExpenses();
@@ -58,18 +64,22 @@ export function ExpensesClient({
 
   const handleSearch = async (value: string) => {
     setSearch(value);
-    const data = await getExpenses(month, year, value || undefined);
+    const data = await getExpenses(
+      initialMonth,
+      initialYear,
+      value || undefined,
+    );
     setExpenses(data as Expense[]);
   };
 
   const handleExport = async () => {
     try {
-      const csv = await exportExpensesToCSV(month, year);
+      const csv = await exportExpensesToCSV(initialMonth, initialYear);
       const blob = new Blob([csv], { type: "text/csv" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `expenses-${year}-${month.toString().padStart(2, "0")}.csv`;
+      a.download = `expenses-${initialYear}-${initialMonth.toString().padStart(2, "0")}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -80,16 +90,17 @@ export function ExpensesClient({
   };
 
   const handleBulkImport = async (
-    detectedExpenses: {
-      date: string;
-      description: string;
-      amount: number;
-      currency: string;
-      category: ExpenseCategory;
-    }[],
+    detectedExpenses: Omit<DetectedExpense, "id" | "selected">[],
   ) => {
     for (const expense of detectedExpenses) {
-      await createExpense(expense);
+      await createExpense({
+        ...expense,
+        category: EXPENSE_CATEGORIES.includes(
+          expense.category as ExpenseCategory,
+        )
+          ? (expense.category as ExpenseCategory)
+          : "other",
+      });
     }
     await refreshExpenses();
   };
@@ -97,16 +108,16 @@ export function ExpensesClient({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
+      {/* <div>
         <h1 className="text-2xl font-bold uppercase tracking-wider">
           Expenses
         </h1>
         <p className="text-sm text-muted-foreground">Managing Your Expenses</p>
-      </div>
+      </div> */}
 
       {/* Expenses Card */}
       <Card className="border-border bg-card">
-        <CardContent className="p-6">
+        <CardContent>
           {/* Top row: icon+title left, Add Record right */}
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -116,7 +127,7 @@ export function ExpensesClient({
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-xl font-bold">Expenses</h2>
-                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                  {/* <ExternalLink className="h-4 w-4 text-muted-foreground" /> */}
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Manage and track your daily spending

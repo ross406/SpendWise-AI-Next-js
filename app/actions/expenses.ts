@@ -9,6 +9,7 @@ import {
   type ExpenseCategory,
   EXPENSE_CATEGORIES,
 } from "@/lib/db/models/expense";
+import { getMonthDateRange } from "@/lib/utils";
 
 export async function getExpenses(
   month: number,
@@ -23,8 +24,7 @@ export async function getExpenses(
 
   await connectToDatabase();
 
-  const startDate = new Date(year, month - 1, 1);
-  const endDate = new Date(year, month, 0, 23, 59, 59);
+  const { startDate, endDate } = getMonthDateRange(month, year);
 
   const query: Record<string, unknown> = {
     clerkUserId: userId,
@@ -40,7 +40,7 @@ export async function getExpenses(
   return expenses.map((expense) => ({
     ...expense,
     _id: expense._id.toString(),
-    date: expense.date.toISOString(),
+    date: expense.date.toISOString().split("T")[0],
     createdAt: expense.createdAt.toISOString(),
     updatedAt: expense.updatedAt.toISOString(),
   }));
@@ -70,13 +70,13 @@ export async function createExpense(data: {
     category: data.category,
   });
 
-  revalidatePath("/expenses", "max");
-  revalidatePath("/dashboard", "max");
+  revalidatePath("/expenses", "layout");
+  revalidatePath("/dashboard", "layout");
 
   return {
     ...expense.toObject(),
     _id: expense._id.toString(),
-    date: expense.date.toISOString(),
+    date: expense.date.toISOString().split("T")[0],
   };
 }
 
@@ -113,13 +113,13 @@ export async function updateExpense(
     throw new Error("Expense not found");
   }
 
-  revalidatePath("/expenses", "max");
-  revalidatePath("/dashboard", "max");
+  revalidatePath("/expenses", "layout");
+  revalidatePath("/dashboard", "layout");
 
   return {
     ...expense.toObject(),
     _id: expense._id.toString(),
-    date: expense.date.toISOString(),
+    date: expense.date.toISOString().split("T")[0],
   };
 }
 
@@ -141,8 +141,8 @@ export async function deleteExpense(id: string) {
     throw new Error("Expense not found");
   }
 
-  revalidatePath("/expenses", "max");
-  revalidatePath("/dashboard", "max");
+  revalidatePath("/expenses", "layout");
+  revalidatePath("/dashboard", "layout");
 
   return { success: true };
 }
@@ -156,8 +156,7 @@ export async function getTotalExpenses(month: number, year: number) {
 
   await connectToDatabase();
 
-  const startDate = new Date(year, month - 1, 1);
-  const endDate = new Date(year, month, 0, 23, 59, 59);
+  const { startDate, endDate } = getMonthDateRange(month, year);
 
   const result = await Expense.aggregate([
     {
@@ -186,8 +185,7 @@ export async function getExpensesByCategory(month: number, year: number) {
 
   await connectToDatabase();
 
-  const startDate = new Date(year, month - 1, 1);
-  const endDate = new Date(year, month, 0, 23, 59, 59);
+  const { startDate, endDate } = getMonthDateRange(month, year);
 
   const result = await Expense.aggregate([
     {

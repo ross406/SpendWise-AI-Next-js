@@ -22,6 +22,7 @@ export default async function ExpensesPage({
   const expenses = await getExpenses(month, year);
   return (
     <ExpensesClient
+      key={`${month}-${year}`}
       initialExpenses={expenses}
       initialMonth={month}
       initialYear={year}

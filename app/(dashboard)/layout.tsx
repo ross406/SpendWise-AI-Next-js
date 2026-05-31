@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Sidebar } from "@/components/sidebar";
 import { Header } from "@/components/header";
@@ -11,6 +11,7 @@ import { CurrencyProvider } from "@/lib/contexts/currency-context";
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const now = new Date();
 
   const [month, setMonth] = useState(now.getMonth() + 1);
@@ -32,7 +33,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     setMonth(newMonth);
     setYear(newYear);
     // Update URL with new month/year
-    router.push(`?month=${newMonth}&year=${newYear}`);
+    router.push(`${pathname}?month=${newMonth}&year=${newYear}`);
   };
 
   return (

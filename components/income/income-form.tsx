@@ -83,7 +83,7 @@ export function IncomeForm({ income, trigger, onSuccess }: IncomeFormProps) {
     setIsLoading(true);
     try {
       const payload = {
-        date: data.date.toISOString(),
+        date: format(data.date, "yyyy-MM-dd"),
         description: data.description,
         amount: data.amount,
         currency: data.currency,

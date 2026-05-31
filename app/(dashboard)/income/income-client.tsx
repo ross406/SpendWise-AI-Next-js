@@ -30,25 +30,23 @@ export function IncomeClient({
   initialYear,
 }: IncomeClientProps) {
   const [incomes, setIncomes] = useState<Income[]>(initialIncomes);
-  const [month] = useState(initialMonth);
-  const [year] = useState(initialYear);
 
   const refreshIncomes = useCallback(async () => {
-    const data = await getIncomes(month, year);
+    const data = await getIncomes(initialMonth, initialYear);
     setIncomes(data as Income[]);
-  }, [month, year]);
+  }, [initialMonth, initialYear]);
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
+      {/* <div>
         <h1 className="text-2xl font-bold uppercase tracking-wider">Income</h1>
         <p className="text-sm text-muted-foreground">Managing Your Salaries</p>
-      </div>
+      </div> */}
 
       {/* Income Card */}
       <Card className="border-border bg-card">
-        <CardContent className="p-6">
+        <CardContent>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-income/10">
@@ -57,7 +55,7 @@ export function IncomeClient({
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-xl font-bold">Income</h2>
-                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                  {/* <ExternalLink className="h-4 w-4 text-muted-foreground" /> */}
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Manage your income sources and history
