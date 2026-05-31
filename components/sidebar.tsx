@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -42,6 +42,20 @@ interface SidebarProps {
 
 export function Sidebar({ open = true, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const buildHref = (href: string) => {
+    const month = searchParams.get("month");
+    const year = searchParams.get("year");
+
+    if (!month && !year) return href;
+
+    const params = new URLSearchParams();
+    if (month) params.set("month", month);
+    if (year) params.set("year", year);
+
+    return `${href}?${params.toString()}`;
+  };
 
   return (
     <aside
@@ -72,7 +86,7 @@ export function Sidebar({ open = true, onClose }: SidebarProps) {
           return (
             <Link
               key={item.href}
-              href={item.href}
+              href={buildHref(item.href)}
               onClick={() => onClose?.()}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
