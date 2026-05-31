@@ -58,7 +58,7 @@ interface ExpensesClientProps {
 
 type ViewMode = "table" | "board";
 
-type VoiceStatus = "idle" | "review" | "processing" | "error";
+type VoiceStatus = "idle" | "review" | "processing" | "success" | "error";
 
 export function ExpensesClient({
   initialExpenses,
@@ -73,6 +73,8 @@ export function ExpensesClient({
   const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>("idle");
 
   const [voiceError, setVoiceError] = useState("");
+
+  const [createdExpense, setCreatedExpense] = useState<any>(null);
 
   const refreshExpenses = useCallback(async () => {
     const data = await getExpenses(
@@ -133,22 +135,30 @@ export function ExpensesClient({
   async function createExpenseFromVoice(transcript: string) {
     const parsed: any = await parseVoiceExpense(transcript);
     console.log("Parsed voice expense:", parsed);
+
     if (parsed.expense) {
-      return createExpense(parsed.expense);
+      const expense = await createExpense(parsed.expense);
+
+      return {
+        expense: parsed.expense,
+        created: expense,
+      };
     }
+
+    throw new Error("No expense detected");
   }
 
   const processTranscript = async () => {
     try {
       setVoiceError("");
       setVoiceStatus("processing");
-
-      await createExpenseFromVoice(transcript);
+      const result = await createExpenseFromVoice(transcript);
 
       await refreshExpenses();
 
-      setTranscript("");
-      setVoiceStatus("idle");
+      setCreatedExpense(result.expense);
+
+      setVoiceStatus("success");
     } catch (error) {
       setVoiceError(
         error instanceof Error
@@ -237,6 +247,7 @@ export function ExpensesClient({
                   setVoiceStatus("idle");
                   setVoiceError("");
                   setTranscript("");
+                  setCreatedExpense(null);
                 }
               }}
             >
@@ -259,6 +270,7 @@ export function ExpensesClient({
                     {voiceStatus === "processing" &&
                       "Understanding Your Expense"}
                     {voiceStatus === "error" && "Unable To Process Expense"}
+                    {voiceStatus === "success" && "Expense Added Successfully"}
                   </DialogTitle>
                 </DialogHeader>
                 {voiceStatus === "review" && (
@@ -353,6 +365,61 @@ export function ExpensesClient({
                         }}
                       >
                         Retry
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {voiceStatus === "success" && createdExpense && (
+                  <div className="space-y-4">
+                    <div className="rounded-md border border-green-500/20 bg-green-500/10 p-4">
+                      <p className="font-medium text-green-700 dark:text-green-400">
+                        Expense added successfully
+                      </p>
+
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Your expense has been recorded.
+                      </p>
+                    </div>
+
+                    <div className="rounded-md border p-4 space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          Description
+                        </span>
+                        <span>{createdExpense.description}</span>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Amount</span>
+                        <span>
+                          {createdExpense.currency} {createdExpense.amount}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Category</span>
+                        <span className="capitalize">
+                          {createdExpense.category}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Date</span>
+                        <span>{createdExpense.date}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <Button
+                        onClick={() => {
+                          setTranscript("");
+                          setVoiceError("");
+                          setCreatedExpense(null);
+                          setVoiceStatus("idle");
+                        }}
+                      >
+                        Done
                       </Button>
                     </div>
                   </div>
