@@ -9,13 +9,23 @@ import {
   Sparkles,
   LayoutGrid,
   Table2,
+  Loader2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ExpensesTable } from "@/components/expenses/expenses-table";
 import { ExpensesBoard } from "@/components/expenses/expenses-board";
-import { ExpenseForm } from "@/components/expenses/expense-form";
+import {
+  ExpenseForm,
+  ExpenseFormData,
+} from "@/components/expenses/expense-form";
 import { BankStatementImport } from "@/components/expenses/bank-statement-import";
 import {
   getExpenses,
@@ -27,6 +37,9 @@ import {
   type ExpenseCategory,
 } from "@/lib/db/models/expense-types";
 import { DetectedExpense } from "@/components/expenses/types";
+import { VoiceExpenseButton } from "@/components/expenses/voice-expense-button";
+import { parseVoiceExpense } from "@/components/expenses/gemini-parser";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Expense {
   _id: string;
@@ -45,6 +58,8 @@ interface ExpensesClientProps {
 
 type ViewMode = "table" | "board";
 
+type VoiceStatus = "idle" | "review" | "processing" | "error";
+
 export function ExpensesClient({
   initialExpenses,
   initialMonth,
@@ -53,6 +68,11 @@ export function ExpensesClient({
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
   const [search, setSearch] = useState("");
   const [view, setView] = useState<ViewMode>("table");
+
+  const [transcript, setTranscript] = useState("");
+  const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>("idle");
+
+  const [voiceError, setVoiceError] = useState("");
 
   const refreshExpenses = useCallback(async () => {
     const data = await getExpenses(
@@ -108,6 +128,36 @@ export function ExpensesClient({
       });
     }
     await refreshExpenses();
+  };
+
+  async function createExpenseFromVoice(transcript: string) {
+    const parsed: any = await parseVoiceExpense(transcript);
+    console.log("Parsed voice expense:", parsed);
+    if (parsed.expense) {
+      return createExpense(parsed.expense);
+    }
+  }
+
+  const processTranscript = async () => {
+    try {
+      setVoiceError("");
+      setVoiceStatus("processing");
+
+      await createExpenseFromVoice(transcript);
+
+      await refreshExpenses();
+
+      setTranscript("");
+      setVoiceStatus("idle");
+    } catch (error) {
+      setVoiceError(
+        error instanceof Error
+          ? error.message
+          : "Failed to process voice expense",
+      );
+
+      setVoiceStatus("error");
+    }
   };
 
   return (
@@ -172,6 +222,143 @@ export function ExpensesClient({
               }
             />
 
+            <VoiceExpenseButton
+              // disabled={isProcessingVoice}
+              onTranscript={(text) => {
+                setTranscript(text);
+                setVoiceError("");
+                setVoiceStatus("review");
+              }}
+            />
+            <Dialog
+              open={voiceStatus !== "idle"}
+              onOpenChange={(open) => {
+                if (!open && voiceStatus !== "processing") {
+                  setVoiceStatus("idle");
+                  setVoiceError("");
+                  setTranscript("");
+                }
+              }}
+            >
+              <DialogContent
+                onPointerDownOutside={(e) => {
+                  if (voiceStatus === "processing") {
+                    e.preventDefault();
+                  }
+                }}
+                onEscapeKeyDown={(e) => {
+                  if (voiceStatus === "processing") {
+                    e.preventDefault();
+                  }
+                }}
+                className="sm:max-w-md"
+              >
+                <DialogHeader>
+                  <DialogTitle>
+                    {voiceStatus === "review" && "Review Voice Expense"}
+                    {voiceStatus === "processing" &&
+                      "Understanding Your Expense"}
+                    {voiceStatus === "error" && "Unable To Process Expense"}
+                  </DialogTitle>
+                </DialogHeader>
+                {voiceStatus === "review" && (
+                  <div className="space-y-4">
+                    <div>
+                      <p className="mb-2 text-sm text-muted-foreground">
+                        Review your expense
+                      </p>
+
+                      <Textarea
+                        value={transcript}
+                        onChange={(e) => setTranscript(e.target.value)}
+                        placeholder="Describe your expense..."
+                        rows={4}
+                        className="resize-none"
+                      />
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Edit the text if speech recognition made any mistakes.
+                    </p>
+
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setTranscript("");
+                          setVoiceStatus("idle");
+                        }}
+                      >
+                        Speak Again
+                      </Button>
+
+                      <Button
+                        onClick={processTranscript}
+                        disabled={!transcript.trim()}
+                      >
+                        Confirm
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {voiceStatus === "processing" && (
+                  <div className="flex flex-col items-center gap-4 py-6">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+
+                    <div className="text-center">
+                      <p className="font-medium">{transcript}</p>
+
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Gemini is extracting the amount, category, description
+                        and date...
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {voiceStatus === "error" && (
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Transcript
+                      </p>
+
+                      <Textarea
+                        value={transcript}
+                        onChange={(e) => setTranscript(e.target.value)}
+                        rows={4}
+                      />
+                    </div>
+
+                    <div className="rounded-md border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
+                      {voiceError}
+                    </div>
+
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setTranscript("");
+                          setVoiceError("");
+                          setVoiceStatus("idle");
+                        }}
+                      >
+                        Speak Again
+                      </Button>
+
+                      <Button
+                        onClick={async () => {
+                          setVoiceError("");
+                          await processTranscript();
+                        }}
+                      >
+                        Retry
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
             {/* View toggle */}
             <div className="flex items-center rounded-lg border border-border overflow-hidden ml-auto">
               <Button

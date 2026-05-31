@@ -46,7 +46,7 @@ const expenseSchema = z.object({
   category: z.string(),
 });
 
-type ExpenseFormData = z.infer<typeof expenseSchema>;
+export type ExpenseFormData = z.infer<typeof expenseSchema>;
 
 const categoryLabels: Record<string, string> = {
   housing: "Housing",

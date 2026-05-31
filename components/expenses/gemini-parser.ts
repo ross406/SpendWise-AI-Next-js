@@ -21,3 +21,17 @@ export async function parseStatementWithGemini(
   const data = await response.json();
   return data.expenses;
 }
+
+export async function parseVoiceExpense(transcript: string) {
+  const response = await fetch("/api/expenses/voice", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      transcript: transcript,
+    }),
+  });
+
+  return await response.json();
+}
