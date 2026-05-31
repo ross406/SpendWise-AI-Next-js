@@ -35,7 +35,6 @@ export type ExpenseCategory =
   | "transport"
   | "entertainment"
   | "healthcare"
-  | "shopping"
   | "other";
 
 interface Expense {

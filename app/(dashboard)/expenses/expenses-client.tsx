@@ -4,15 +4,17 @@ import { useState, useCallback, useEffect } from "react";
 import {
   TrendingDown,
   Plus,
-  ExternalLink,
   Search,
   Download,
   Sparkles,
+  LayoutGrid,
+  Table2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ExpensesTable } from "@/components/expenses/expenses-table";
+import { ExpensesBoard } from "@/components/expenses/expenses-board";
 import { ExpenseForm } from "@/components/expenses/expense-form";
 import { BankStatementImport } from "@/components/expenses/bank-statement-import";
 import {
@@ -41,6 +43,8 @@ interface ExpensesClientProps {
   initialYear: number;
 }
 
+type ViewMode = "table" | "board";
+
 export function ExpensesClient({
   initialExpenses,
   initialMonth,
@@ -48,6 +52,7 @@ export function ExpensesClient({
 }: ExpensesClientProps) {
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
   const [search, setSearch] = useState("");
+  const [view, setView] = useState<ViewMode>("table");
 
   const refreshExpenses = useCallback(async () => {
     const data = await getExpenses(
@@ -107,15 +112,7 @@ export function ExpensesClient({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      {/* <div>
-        <h1 className="text-2xl font-bold uppercase tracking-wider">
-          Expenses
-        </h1>
-        <p className="text-sm text-muted-foreground">Managing Your Expenses</p>
-      </div> */}
-
-      {/* Expenses Card */}
+      {/* Header Card */}
       <Card className="border-border bg-card">
         <CardContent>
           {/* Top row: icon+title left, Add Record right */}
@@ -125,10 +122,7 @@ export function ExpensesClient({
                 <TrendingDown className="h-6 w-6 text-expense" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-bold">Expenses</h2>
-                  {/* <ExternalLink className="h-4 w-4 text-muted-foreground" /> */}
-                </div>
+                <h2 className="text-xl font-bold">Expenses</h2>
                 <p className="text-sm text-muted-foreground">
                   Manage and track your daily spending
                 </p>
@@ -147,7 +141,7 @@ export function ExpensesClient({
             />
           </div>
 
-          {/* Bottom row: search + secondary actions */}
+          {/* Bottom row: search + actions + view toggle */}
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <div className="relative flex-1 sm:max-w-48">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -177,16 +171,54 @@ export function ExpensesClient({
                 </Button>
               }
             />
+
+            {/* View toggle */}
+            <div className="flex items-center rounded-lg border border-border overflow-hidden ml-auto">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setView("table")}
+                className={`h-9 w-9 rounded-none border-0 cursor-pointer transition-colors ${
+                  view === "table"
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                title="Table view"
+              >
+                <Table2 className="h-4 w-4" />
+              </Button>
+              <div className="w-px h-5 bg-border" />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setView("board")}
+                className={`h-9 w-9 rounded-none border-0 cursor-pointer transition-colors ${
+                  view === "board"
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                title="Board view"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Expenses Table */}
-      <Card className="border-border bg-card">
-        <CardContent className="overflow-x-auto p-0">
-          <ExpensesTable expenses={expenses} onRefresh={refreshExpenses} />
-        </CardContent>
-      </Card>
+      {/* Table view */}
+      {view === "table" && (
+        <Card className="border-border bg-card">
+          <CardContent className="overflow-x-auto p-0">
+            <ExpensesTable expenses={expenses} onRefresh={refreshExpenses} />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Board view */}
+      {view === "board" && (
+        <ExpensesBoard expenses={expenses} onRefresh={refreshExpenses} />
+      )}
     </div>
   );
 }

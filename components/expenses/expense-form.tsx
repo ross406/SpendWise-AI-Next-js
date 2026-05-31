@@ -56,7 +56,6 @@ const categoryLabels: Record<string, string> = {
   transport: "Transport",
   entertainment: "Entertainment",
   healthcare: "Healthcare",
-  shopping: "Shopping",
   other: "Other",
 };
 
